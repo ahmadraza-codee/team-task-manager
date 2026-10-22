@@ -32,9 +32,9 @@ module.exports = {
   getTask: (id)=>one('SELECT * FROM tasks WHERE id=$1',[id]),
   updateTask: (id,d)=>one('UPDATE tasks SET title=$1,description=$2,status=$3,priority=$4,due_date=$5,team_id=$6,assigned_to=$7,updated_at=NOW() WHERE id=$8 RETURNING *',[d.title,d.description||'',d.status,d.priority,d.due_date||null,d.team_id,d.assigned_to||null,id]),
   deleteTask: async(id)=>{ await pool.query('DELETE FROM tasks WHERE id=$1',[id]); },
-  listTasks: (uid,{teamId,assignee,status,search}={})=>{
+  listTasks: (uid,{teamId,assignee,assigneeId,status,priority,search}={})=>{ assignee = assignee||assigneeId;
     const cond=['m.user_id=$1']; const vals=[uid]; let i=2;
-    if(teamId){cond.push(`t.team_id=$${i++}`); vals.push(teamId);} if(assignee){cond.push(`t.assigned_to=$${i++}`); vals.push(assignee);} if(status){cond.push(`t.status=$${i++}`); vals.push(status);} if(search){cond.push(`(t.title ILIKE $${i} OR t.description ILIKE $${i})`); vals.push(`%${search}%`); i++;}
+    if(teamId){cond.push(`t.team_id=$${i++}`); vals.push(teamId);} if(assignee){cond.push(`t.assigned_to=$${i++}`); vals.push(assignee);} if(status){cond.push(`t.status=$${i++}`); vals.push(status);} if(priority){cond.push(`t.priority=$${i++}`); vals.push(priority);} if(search){cond.push(`(t.title ILIKE $${i} OR t.description ILIKE $${i})`); vals.push(`%${search}%`); i++;}
     return q(`SELECT t.* FROM tasks t JOIN team_members m ON m.team_id=t.team_id WHERE ${cond.join(' AND ')} ORDER BY t.id`, vals);
   },
   remindersForUser: async(uid)=>{ const today=new Date().toISOString().slice(0,10); const rows=await q("SELECT * FROM tasks WHERE assigned_to=$1 AND status<>'done' AND due_date IS NOT NULL AND due_date <= $2 ORDER BY due_date",[uid,today]); return { overdue: rows.filter(t=>String(t.due_date).slice(0,10)<today), due_today: rows.filter(t=>String(t.due_date).slice(0,10)===today) }; },

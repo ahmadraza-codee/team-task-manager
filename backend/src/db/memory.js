@@ -37,11 +37,12 @@ module.exports = {
   getTask: async (id) => tasks.find(t=>t.id===Number(id))||null,
   updateTask: async (id, data) => { const t=await module.exports.getTask(id); if(t) Object.assign(t, data, {team_id:Number(data.team_id||t.team_id), assigned_to:data.assigned_to?Number(data.assigned_to):null, updated_at:now()}); return t; },
   deleteTask: async (id) => { const i=tasks.findIndex(t=>t.id===Number(id)); if(i>=0) tasks.splice(i,1); },
-  listTasks: async (uid, {teamId, assignee, status, search}={}) => {
+  listTasks: async (uid, {teamId, assignee, assigneeId, status, priority, search}={}) => {
     let out = tasks.filter(t=>teamMembers.some(m=>m.team_id===t.team_id&&m.user_id===Number(uid)));
     if(teamId) out=out.filter(t=>t.team_id===Number(teamId));
-    if(assignee) out=out.filter(t=>t.assigned_to===Number(assignee));
+    const asg = assignee||assigneeId; if(asg) out=out.filter(t=>t.assigned_to===Number(asg));
     if(status) out=out.filter(t=>t.status===status);
+    if(priority) out=out.filter(t=>t.priority===priority);
     if(search) { const q=search.toLowerCase(); out=out.filter(t=>(t.title+' '+(t.description||'')).toLowerCase().includes(q)); }
     return out.sort((a,b)=>a.id-b.id);
   },
