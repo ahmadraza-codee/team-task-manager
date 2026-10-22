@@ -1,1 +1,11 @@
-export default function ReminderBanner({reminders}){ if(!reminders) return null; const {overdue=[],due_today=[]}=reminders; if(!overdue.length&&!due_today.length) return null; return <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-4"><h3 className="font-semibold text-amber-900">Due date reminders</h3>{overdue.length>0&&<p className="text-red-700 text-sm">Overdue: {overdue.map(t=>t.title).join(", ")}</p>}{due_today.length>0&&<p className="text-amber-800 text-sm">Due today: {due_today.map(t=>t.title).join(", ")}</p>}</div>; }
+
+export default function ReminderBanner({ reminders }) {
+  if (!reminders) return null;
+  const { overdue = [], due_today = [] } = reminders;
+  if (!overdue.length && !due_today.length) return null;
+  return <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-4">
+    <h3 className="font-semibold text-amber-900">Due date reminders</h3>
+    {overdue.length > 0 && <p className="text-red-700 text-sm">Overdue: {overdue.map(t => t.title).join(', ')}</p>}
+    {due_today.length > 0 && <p className="text-amber-800 text-sm">Due today: {due_today.map(t => t.title).join(', ')}</p>}
+  </div>;
+}
