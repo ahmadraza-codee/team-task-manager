@@ -13,7 +13,7 @@ app.use(express.json());
 let store;
 if (process.env.DATABASE_URL) { const PgSession = require('connect-pg-simple')(session); const db = require('./db'); store = new PgSession({ pool: db.pool, createTableIfMissing: true }); console.log('[session] Using PostgreSQL session store'); }
 else console.log('[session] Using memory session store (dev fallback)');
-app.use(session({ store, secret: process.env.SESSION_SECRET || 'dev-secret-change-me', resave: false, saveUninitialized: false, cookie: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 * 7 } }));
+app.use(session({ store, secret: process.env.SESSION_SECRET || 'dev-secret-change-me', resave: false, saveUninitialized: false, cookie: { httpOnly: true, sameSite: process.env.COOKIE_SAMESITE || 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 * 7 } }));
 app.use(passport.initialize()); app.use(passport.session());
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'team-task-manager', db: process.env.DATABASE_URL ? 'postgres' : 'memory' }));
 // Basic rate limiting on auth endpoints (100 requests / 15 min per IP) - brute-force protection without breaking normal use
