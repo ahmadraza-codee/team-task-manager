@@ -1,6 +1,9 @@
 
 // PostgreSQL implementation (used on GCP Cloud SQL). Same interface as memory.js.
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
+// Return timestamps as ISO strings instead of Date objects, so date logic like due_date.slice(0,10) behaves the same as the JSON the API sends
+types.setTypeParser(1114, (v) => new Date(v).toISOString());
+types.setTypeParser(1184, (v) => new Date(v).toISOString());
 const fs = require('fs'); const path = require('path');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.PGSSLMODE==='require' ? { rejectUnauthorized:false } : undefined });
 const pub = (u) => u && ({ id: u.id, name: u.name, email: u.email, created_at: u.created_at });
