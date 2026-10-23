@@ -7,6 +7,7 @@ const passport = require('./config/passport');
 const { requireAuth } = require('./middleware/auth');
 require('dotenv').config();
 const app = express();
+app.set('trust proxy', 1); // Hosting proxies (Render/GCP) terminate TLS; without this Express sees requests as insecure and refuses to set Secure session cookies
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true })); // CORS restricted to the frontend origin
 app.use(express.json());
 // Session store: PostgreSQL via connect-pg-simple when DATABASE_URL is set, otherwise memory store (dev fallback)
