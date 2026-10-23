@@ -4,6 +4,8 @@ const { Pool, types } = require('pg');
 // Return timestamps as ISO strings instead of Date objects, so date logic like due_date.slice(0,10) behaves the same as the JSON the API sends
 types.setTypeParser(1114, (v) => new Date(v).toISOString());
 types.setTypeParser(1184, (v) => new Date(v).toISOString());
+// DATE columns (due_date) also parse to Date objects by default; keep them as plain YYYY-MM-DD strings
+types.setTypeParser(1082, (v) => v);
 const fs = require('fs'); const path = require('path');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.PGSSLMODE==='require' ? { rejectUnauthorized:false } : undefined });
 const pub = (u) => u && ({ id: u.id, name: u.name, email: u.email, created_at: u.created_at });
